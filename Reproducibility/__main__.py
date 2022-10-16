@@ -61,7 +61,7 @@ def get_args():
 
 
 def resnet18(num_classes):
-    model = models.resnet18()
+    model = models.resnet18(num_classes=num_classes)
     model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7,
                                   stride=2, padding=3, bias=False)
     return model
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         "atienza": atienza,
     }
 
-    model = LitClassifierModel(model_selector[args.surname],
+    model = LitClassifierModel(model=model_selector[args.surname],
                                num_classes=args.num_classes,
                                lr=args.lr, batch_size=args.batch_size)
     datamodule = ImageNetDataModule(
