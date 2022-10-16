@@ -23,8 +23,9 @@ class ImageNetDataModule(LightningDataModule):
         self.train_dataset = datasets.ImageNet(
             "/data/imagenet/", split='train', transform=self.transform)
 
-        # self.val_dataset = datasets.ImageNet(
-        #     "/data/imagenet/", split='train', transform=self.transform)
+        # validation step is the same as test step
+        self.val_dataset = datasets.ImageNet(
+            "/data/imagenet/", split='val', transform=self.transform)
 
         self.test_dataset = datasets.ImageNet(
             "/data/imagenet/", split='val', transform=self.transform)
@@ -41,14 +42,14 @@ class ImageNetDataModule(LightningDataModule):
             pin_memory=True,
         )
 
-    # def val_dataloader(self):
-    #     return torch.utils.data.DataLoader(
-    #         self.val_dataset,
-    #         batch_size=self.batch_size,
-    #         num_workers=self.num_workers,
-    #         shuffle=False,
-    #         pin_memory=True,
-    #     )
+    def val_dataloader(self):
+        return torch.utils.data.DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False,
+            pin_memory=True,
+        )
 
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
