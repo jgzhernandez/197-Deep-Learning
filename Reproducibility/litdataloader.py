@@ -16,7 +16,8 @@ class ImageNetDataModule(LightningDataModule):
     def prepare_data(self):
         self.transform = transforms.Compose([
             transforms.Grayscale(),
-            transforms.CenterCrop(100),
+            transforms.Pad(300),
+            transforms.CenterCrop(400),
             transforms.ToTensor(),
         ])
 
