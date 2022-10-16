@@ -6,7 +6,7 @@ from pytorch_lightning import LightningModule
 
 
 class LitClassifierModel(LightningModule):
-    def __init__(self, model=models.resnet18(num_classes=10), num_classes=10, lr=0.001, batch_size=32):
+    def __init__(self, model, num_classes=10, lr=0.001, batch_size=32):
         super().__init__()
         # To satisfy a warning
         self.save_hyperparameters(ignore=['model'])

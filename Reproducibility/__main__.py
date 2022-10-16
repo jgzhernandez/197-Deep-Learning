@@ -28,14 +28,16 @@ class WandbCallback(Callback):
             data = [[wandb.Image(x_i), y_i, y_pred] for x_i, y_i, y_pred in list(
                 zip(x[:n], y[:n], outputs[:n]))]
             wandb_logger.log_table(
-                key='ResNet18 on ImageNet Predictions',
+                key=f'{args.surname[0].capitalize()} on ImageNet Predictions',
                 columns=columns,
                 data=data)
 
 
 def get_args():
-    parser = ArgumentParser(description="PyTorch Lightning MNIST Example")
-    parser.add_argument("--surname", type=str, help="surname")
+    parser = ArgumentParser(
+        description="PyTorch Lightning Classifier Example on ImageNet1k")
+    parser.add_argument("--surname", type=str,
+                        default="resnet18", help="surname")
 
     parser.add_argument("--max-epochs", type=int, default=5, help="num epochs")
     parser.add_argument("--batch-size", type=int,
@@ -77,7 +79,7 @@ if __name__ == "__main__":
         "atienza": atienza,
     }
 
-    model = LitClassifierModel(model_selector.get(args.surname, resnet18(args.num_classes)),
+    model = LitClassifierModel(model_selector[args.surname],
                                num_classes=args.num_classes,
                                lr=args.lr, batch_size=args.batch_size)
     datamodule = ImageNetDataModule(
@@ -88,11 +90,11 @@ if __name__ == "__main__":
     print(model)
 
     # wandb is a great way to debug and visualize this model
-    wandb_logger = WandbLogger(project="pl-mnist")
+    wandb_logger = WandbLogger(project=f"pl-{args.surname}")
 
     model_checkpoint = ModelCheckpoint(
         dirpath=os.path.join(args.path, "checkpoints"),
-        filename="resnet18-mnist-best-acc",
+        filename=f"{args.surname}-best-acc",
         save_top_k=1,
         verbose=True,
         monitor='test_acc',
