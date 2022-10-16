@@ -1,0 +1,13 @@
+# For jupyter to run with venv
+ipykernel
+# For jupyter to run in tmux
+# jupyter nbconvert --to notebook --execute mod_mnist_demo.ipynb --output mod_mnist_demo.ipynb
+nbconvert
+
+pytorch-lightning
+torchmetrics
+
+torch>=1.8.11
+torchvision>=0.9.1
+
+wandb
