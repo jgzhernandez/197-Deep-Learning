@@ -79,7 +79,7 @@ if __name__ == "__main__":
         "atienza": atienza,
     }
 
-    model = LitClassifierModel(model=model_selector[args.surname],
+    model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
                                num_classes=args.num_classes,
                                lr=args.lr, batch_size=args.batch_size)
     datamodule = ImageNetDataModule(

@@ -8,7 +8,7 @@ class LitClassifierModel(LightningModule):
     def __init__(self, model, num_classes=10, lr=0.001, batch_size=32):
         super().__init__()
         # To satisfy a warning
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=['model'])
         self.model = model
         self.loss = torch.nn.CrossEntropyLoss()
 
