@@ -4,6 +4,8 @@ ipykernel
 # jupyter nbconvert --to notebook --execute mod_mnist_demo.ipynb --output mod_mnist_demo.ipynb
 nbconvert
 
+protobuf==3.20.*
+
 pytorch-lightning
 torchmetrics
 
