@@ -59,7 +59,10 @@ def get_args():
 
 
 def resnet18(num_classes):
-    return models.resnet18(num_classes)
+    model = models.resnet18()
+    model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7,
+                                  stride=2, padding=3, bias=False)
+    return model
 
 
 def atienza(num_classes):

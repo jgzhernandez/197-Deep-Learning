@@ -8,10 +8,9 @@ from pytorch_lightning import LightningModule
 class LitClassifierModel(LightningModule):
     def __init__(self, model=models.resnet18(num_classes=10), num_classes=10, lr=0.001, batch_size=32):
         super().__init__()
-        self.save_hyperparameters()
+        # To satisfy a warning
+        self.save_hyperparameters(ignore=['model'])
         self.model = model
-        self.model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7,
-                                           stride=2, padding=3, bias=False)
         self.loss = torch.nn.CrossEntropyLoss()
 
     def forward(self, x):
