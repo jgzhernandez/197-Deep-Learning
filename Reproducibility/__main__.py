@@ -90,11 +90,11 @@ if __name__ == "__main__":
     print(model)
 
     # wandb is a great way to debug and visualize this model
-    wandb_logger = WandbLogger(project=f"pl-{args.surname}")
+    wandb_logger = WandbLogger(project=f"reproducibility-pl-{args.surname}")
 
     model_checkpoint = ModelCheckpoint(
         dirpath=os.path.join(args.path, "checkpoints"),
-        filename=f"{args.surname}-best-acc",
+        filename=f"reproducibility-{args.surname}-best-acc",
         save_top_k=1,
         verbose=True,
         monitor='test_acc',
