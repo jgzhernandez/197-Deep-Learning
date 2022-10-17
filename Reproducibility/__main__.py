@@ -12,6 +12,7 @@ from pytorch_lightning.loggers import WandbLogger
 
 from litmodels import LitClassifierModel
 from litdataloader import ImageNetDataModule
+from classnames import CLASS_NAMES_LIST
 
 
 class WandbCallback(Callback):
@@ -23,9 +24,11 @@ class WandbCallback(Callback):
             x, y = batch
             outputs = outputs["y_hat"]
             outputs = torch.argmax(outputs, dim=1)
+
+            classes_to_idx = pl_module.hparams.classes_to_idx
             # log image, ground truth and prediction on wandb table
             columns = ['image', 'ground truth', 'prediction']
-            data = [[wandb.Image(x_i), y_i, y_pred] for x_i, y_i, y_pred in list(
+            data = [[wandb.Image(x_i), classes_to_idx[int(y_i)], classes_to_idx[int(y_pred)]] for x_i, y_i, y_pred in list(
                 zip(x[:n], y[:n], outputs[:n]))]
             wandb_logger.log_table(
                 key=f'{args.surname.capitalize()} on ImageNet Predictions',
@@ -39,7 +42,7 @@ def get_args():
     parser.add_argument("--surname", type=str,
                         default="resnet18", help="surname")
 
-    parser.add_argument("--max-epochs", type=int, default=5, help="num epochs")
+    parser.add_argument("--max-epochs", type=int, default=100, help="num epochs")
     parser.add_argument("--batch-size", type=int,
                         default=32, help="batch size")
     parser.add_argument("--lr", type=float, default=0.001,
@@ -79,11 +82,14 @@ if __name__ == "__main__":
         "atienza": atienza,
     }
 
+    classes_to_idx = CLASS_NAMES_LIST
+
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
                                num_classes=args.num_classes,
                                lr=args.lr, batch_size=args.batch_size)
     datamodule = ImageNetDataModule(
-        path=args.path, batch_size=args.batch_size, num_workers=args.num_workers)
+        path=args.path, batch_size=args.batch_size, num_workers=args.num_workers,
+        class_dict=classes_to_idx)
     datamodule.setup()
 
     # printing the model is useful for debugging
@@ -106,6 +112,7 @@ if __name__ == "__main__":
                       max_epochs=args.max_epochs,
                       logger=wandb_logger if not args.no_wandb else None,
                       callbacks=[model_checkpoint, WandbCallback() if not args.no_wandb else None])
+    model.hparams.classes_to_idx = classes_to_idx
     trainer.fit(model, datamodule=datamodule)
     trainer.test(model, datamodule=datamodule)
 
