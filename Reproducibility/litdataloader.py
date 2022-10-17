@@ -6,20 +6,24 @@ from pytorch_lightning import LightningDataModule
 
 class ImageNetDataModule(LightningDataModule):
     def __init__(self, path, batch_size=128, num_workers=0, class_dict={},
+                 transform=None,
                  **kwargs):
         super().__init__(**kwargs)
         self.path = path
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.class_dict = class_dict
+        self.transform = transform
 
     def prepare_data(self):
-        self.transform = transforms.Compose([
-            transforms.Grayscale(),
-            transforms.Pad(300),
-            transforms.CenterCrop(400),
-            transforms.ToTensor(),
-        ])
+        if self.transform is None:
+            self.transform = transforms.Compose([
+                transforms.Pad(300),
+                transforms.CenterCrop(400),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225]),
+            ])
 
         self.train_dataset = datasets.ImageNet(
             "/data/imagenet/", split='train', transform=self.transform)
