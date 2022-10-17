@@ -1,6 +1,7 @@
 Reproducibility/data
 Reproducibility/pl-mnist
 
-wandb
+checkpoints/
+wandb/
 venv/
 __pycache__/

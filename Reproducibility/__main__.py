@@ -42,24 +42,42 @@ def get_args():
     parser.add_argument("--surname", type=str,
                         default="resnet18", help="surname")
 
-    parser.add_argument("--max-epochs", type=int, default=100, help="num epochs")
-    parser.add_argument("--batch-size", type=int,
-                        default=32, help="batch size")
-    parser.add_argument("--lr", type=float, default=0.001,
-                        help="learning rate")
+    ARG_DEFAULTS = {
+        "--max-epochs" : 100,
+        "--batch-size" : 32,
+        "--lr" : 0.001,
+        "--path" : "./",
+        "--num-classes" : 1000,
+        "--devices" : 1,
+        "--accelerator" : "gpu",
+        "--num-workers" : 48,
+        "--no-wandb" : False,
+    }
+    
+    parser.add_argument("--max-epochs", type=int, help="num epochs")
+    parser.add_argument("--batch-size", type=int, help="batch size")
+    parser.add_argument("--lr", type=float, help="learning rate")
 
-    parser.add_argument("--path", type=str, default="./")
+    parser.add_argument("--path", type=str)
 
-    parser.add_argument("--num-classes", type=int,
-                        default=1000, help="num classes")
+    parser.add_argument("--num-classes", type=int, help="num classes")
 
-    parser.add_argument("--devices", default=1)
-    parser.add_argument("--accelerator", default='gpu')
-    parser.add_argument("--num-workers", type=int,
-                        default=48, help="num workers")
+    parser.add_argument("--devices")
+    parser.add_argument("--accelerator")
+    parser.add_argument("--num-workers", type=int, help="num workers")
 
-    parser.add_argument("--no-wandb", default=False, action='store_true')
+    parser.add_argument("--no-wandb", action='store_true')
     args = parser.parse_args("")
+
+    print(f"surname: {args.surname}")
+    for key, default_value in ARG_DEFAULTS.items():
+        arg_name = "_".join(key.split("-")[2:])
+        arg_text = " ".join(key.split("-")[2:])
+        if args.__getattribute__(arg_name) is None:
+            args.__setattr__(arg_name, default_value)
+        elif args.__getattribute__(arg_name) != default_value:
+            print(f"{arg_text}: {args.__getattribute__(arg_name)}")
+
     return args
 
 
