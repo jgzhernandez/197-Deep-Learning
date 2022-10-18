@@ -1,0 +1,7 @@
+Reproducibility/data
+Reproducibility/pl-mnist
+
+checkpoints/
+wandb/
+venv/
+__pycache__/
