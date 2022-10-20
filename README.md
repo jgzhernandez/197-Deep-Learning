@@ -14,5 +14,6 @@
   <li>git add . (add all) / git add <files or directory></li>
   <li>git commit -m "commit message" </li>
   <li>git push origin HEAD </li>
+  <li>Make a pull request from your branch to main in the github repository</li>
 </ul>
 <h2> Assessment 1: Reproducibility</h2>
