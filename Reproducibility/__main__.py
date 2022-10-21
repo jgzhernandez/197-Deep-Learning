@@ -4,6 +4,8 @@ from torchvision import models
 import os
 from argparse import ArgumentParser
 
+import numpy as np
+
 import wandb
 
 from pytorch_lightning import Callback, Trainer
@@ -18,18 +20,21 @@ from classnames import CLASS_NAMES_LIST
 class WandbCallback(Callback):
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
         global wandb_logger
-        # process first 10 images of the first batch
+        # process 15 random images of the first batch
         if batch_idx == 0:
-            n = 10
+            n = 15
             x, y = batch
             outputs = outputs["y_hat"]
             outputs = torch.argmax(outputs, dim=1)
+
+            #generate n random integers from 0 to len(x)
+            random_image = np.random.randint(0, len(x), n)
 
             classes_to_idx = pl_module.hparams.classes_to_idx
             # log image, ground truth and prediction on wandb table
             columns = ['image', 'ground truth', 'prediction']
             data = [[wandb.Image(x_i), classes_to_idx[int(y_i)], classes_to_idx[int(y_pred)]] for x_i, y_i, y_pred in list(
-                zip(x[:n], y[:n], outputs[:n]))]
+                zip([x[i] for i in random_image], [y[i] for i in random_image], [outputs[i] for i in random_image]))]
             wandb_logger.log_table(
                 key=f'{args.surname.capitalize()} on ImageNet Predictions',
                 columns=columns,
@@ -48,10 +53,10 @@ def get_args():
         "--lr" : 0.001,
         "--path" : "./",
         "--num-classes" : 1000,
-        "--devices" : 1,
+        "--devices" : 0,
         "--accelerator" : "gpu",
         "--num-workers" : 48,
-        "--no-wandb" : False,
+
     }
     
     parser.add_argument("--max-epochs", type=int, help="num epochs")
@@ -66,8 +71,8 @@ def get_args():
     parser.add_argument("--accelerator")
     parser.add_argument("--num-workers", type=int, help="num workers")
 
-    parser.add_argument("--no-wandb", action='store_true')
-    args = parser.parse_args("")
+
+    args = parser.parse_args()
 
     print(f"surname: {args.surname}")
     for key, default_value in ARG_DEFAULTS.items():
@@ -125,11 +130,13 @@ if __name__ == "__main__":
         mode='max',
     )
 
+    device_num = [args.devices]
+
     trainer = Trainer(accelerator=args.accelerator,
-                      devices=args.devices,
+                      devices=device_num,
                       max_epochs=args.max_epochs,
-                      logger=wandb_logger if not args.no_wandb else None,
-                      callbacks=[model_checkpoint, WandbCallback() if not args.no_wandb else None])
+                      logger=wandb_logger,
+                      callbacks=[model_checkpoint, WandbCallback()])
     model.hparams.classes_to_idx = classes_to_idx
     trainer.fit(model, datamodule=datamodule)
     trainer.test(model, datamodule=datamodule)
