@@ -27,7 +27,7 @@ class WandbCallback(Callback):
             outputs = outputs["y_hat"]
             outputs = torch.argmax(outputs, dim=1)
 
-            #generate n random integers from 0 to len(x)
+            # generate n random integers from 0 to len(x)
             random_image = np.random.randint(0, len(x), n)
 
             classes_to_idx = pl_module.hparams.classes_to_idx
@@ -48,17 +48,16 @@ def get_args():
                         default="resnet18", help="surname")
 
     ARG_DEFAULTS = {
-        "--max-epochs" : 100,
-        "--batch-size" : 32,
-        "--lr" : 0.001,
-        "--path" : "./",
-        "--num-classes" : 1000,
-        "--devices" : 0,
-        "--accelerator" : "gpu",
-        "--num-workers" : 48,
-
+        "--max-epochs": 100,
+        "--batch-size": 32,
+        "--lr": 0.001,
+        "--path": "./",
+        "--num-classes": 1000,
+        "--devices": 0,
+        "--accelerator": "gpu",
+        "--num-workers": 48,
     }
-    
+
     parser.add_argument("--max-epochs", type=int, help="num epochs")
     parser.add_argument("--batch-size", type=int, help="batch size")
     parser.add_argument("--lr", type=float, help="learning rate")
@@ -67,10 +66,9 @@ def get_args():
 
     parser.add_argument("--num-classes", type=int, help="num classes")
 
-    parser.add_argument("--devices")
+    parser.add_argument("--devices", type=int, nargs=1)
     parser.add_argument("--accelerator")
     parser.add_argument("--num-workers", type=int, help="num workers")
-
 
     args = parser.parse_args()
 
@@ -130,10 +128,8 @@ if __name__ == "__main__":
         mode='max',
     )
 
-    device_num = [args.devices]
-
     trainer = Trainer(accelerator=args.accelerator,
-                      devices=device_num,
+                      devices=args.devices,
                       max_epochs=args.max_epochs,
                       logger=wandb_logger,
                       callbacks=[model_checkpoint, WandbCallback()])
