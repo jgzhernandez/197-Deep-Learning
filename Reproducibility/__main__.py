@@ -53,7 +53,7 @@ def get_args():
         "--lr": 0.001,
         "--path": "./",
         "--num-classes": 1000,
-        "--devices": 0,
+        "--devices": [0],
         "--accelerator": "gpu",
         "--num-workers": 48,
     }
