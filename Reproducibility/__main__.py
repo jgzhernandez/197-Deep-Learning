@@ -20,9 +20,9 @@ from classnames import CLASS_NAMES_LIST
 class WandbCallback(Callback):
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
         global wandb_logger
-        # process 15 random images of of every 1000th batch
-        if batch_idx % 1000 == 0:
-            n = 15
+        # process (batch_size // 3) random images of of every 5th batch (first 5)
+        if batch_idx % 5 == 0 and batch_idx < 5*5:
+            n = args.batch_size // 3
             x, y = batch
             outputs = outputs["y_hat"]
             outputs = torch.argmax(outputs, dim=1)
