@@ -1,6 +1,8 @@
 import torch
 from torchvision import models
 
+from torchvision.models import SqueezeNet1_1_Weights
+
 import os
 from argparse import ArgumentParser
 
@@ -97,12 +99,26 @@ def atienza(num_classes):
     return resnet18(num_classes)
 
 
+def ancheta(num_classes):
+    # SqueezeNet 1.1
+    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128
+    return models.squeezenet1_1()
+
+
 if __name__ == "__main__":
     args = get_args()
 
+    # Add your model here
     model_selector = {
         "resnet18": resnet18,
         "atienza": atienza,
+        "ancheta": ancheta,
+    }
+
+    # Add the transforms in your recipe, litdataloader has its own
+    # but it's recommended to use the transforms in your recipe
+    transform_selector = {
+        "ancheta": SqueezeNet1_1_Weights.IMAGENET1K_V1.transforms(),
     }
 
     classes_to_idx = CLASS_NAMES_LIST
@@ -113,7 +129,8 @@ if __name__ == "__main__":
                                batch_size=args.batch_size)
     datamodule = ImageNetDataModule(
         path=args.path, batch_size=args.batch_size, num_workers=args.num_workers,
-        class_dict=classes_to_idx)
+        class_dict=classes_to_idx,
+        transform=transform_selector.get(args.surname))
     datamodule.setup()
 
     # printing the model is useful for debugging
