@@ -33,15 +33,18 @@ class LitClassifierModel(LightningModule):
         y_hat = self.forward(x)
         loss = self.loss(y_hat, y)
         acc = accuracy(y_hat, y) * 100.
+        top5_acc = accuracy(y_hat, y, top_k=5) * 100.
         # we use y_hat to display predictions during callback
-        return {"y_hat": y_hat, "test_loss": loss, "test_acc": acc}
+        return {"y_hat": y_hat, "test_loss": loss, "test_acc": acc, "test_top5_acc" : top5_acc}
 
     # this is called at the end of all epochs
     def test_epoch_end(self, outputs):
         avg_loss = torch.stack([x["test_loss"] for x in outputs]).mean()
         avg_acc = torch.stack([x["test_acc"] for x in outputs]).mean()
+        avg_top5_acc = torch.stack([x["test_top5_acc"] for x in outputs]).mean()
         self.log("test_loss", avg_loss, on_epoch=True, prog_bar=True)
         self.log("test_acc", avg_acc, on_epoch=True, prog_bar=True)
+        self.log("test_top5_acc", avg_top5_acc, on_epoch=True, prog_bar=True)
 
     # validation is the same as test
     def validation_step(self, batch, batch_idx):
