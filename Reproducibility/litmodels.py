@@ -5,7 +5,7 @@ from pytorch_lightning import LightningModule
 
 
 class LitClassifierModel(LightningModule):
-    def __init__(self, model, num_classes=1000, lr=0.001, batch_size=32):
+    def __init__(self, model, num_classes=1000, lr=0.001, weight_decay=0, batch_size=32):
         super().__init__()
         # To satisfy a warning
         self.save_hyperparameters(ignore=['model'])
@@ -35,13 +35,14 @@ class LitClassifierModel(LightningModule):
         acc = accuracy(y_hat, y) * 100.
         top5_acc = accuracy(y_hat, y, top_k=5) * 100.
         # we use y_hat to display predictions during callback
-        return {"y_hat": y_hat, "test_loss": loss, "test_acc": acc, "test_top5_acc" : top5_acc}
+        return {"y_hat": y_hat, "test_loss": loss, "test_acc": acc, "test_top5_acc": top5_acc}
 
     # this is called at the end of all epochs
     def test_epoch_end(self, outputs):
         avg_loss = torch.stack([x["test_loss"] for x in outputs]).mean()
         avg_acc = torch.stack([x["test_acc"] for x in outputs]).mean()
-        avg_top5_acc = torch.stack([x["test_top5_acc"] for x in outputs]).mean()
+        avg_top5_acc = torch.stack([x["test_top5_acc"]
+                                   for x in outputs]).mean()
         self.log("test_loss", avg_loss, on_epoch=True, prog_bar=True)
         self.log("test_acc", avg_acc, on_epoch=True, prog_bar=True)
         self.log("test_top5_acc", avg_top5_acc, on_epoch=True, prog_bar=True)
@@ -55,4 +56,4 @@ class LitClassifierModel(LightningModule):
 
     # we use Adam optimizer
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
+        return torch.optim.Adam(self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay)
