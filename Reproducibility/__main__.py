@@ -51,6 +51,7 @@ def get_args():
         "--max-epochs": 100,
         "--batch-size": 32,
         "--lr": 0.001,
+        "--weight-decay": 0,
         "--path": "./",
         "--num-classes": 1000,
         "--devices": [0],
@@ -61,6 +62,7 @@ def get_args():
     parser.add_argument("--max-epochs", type=int, help="num epochs")
     parser.add_argument("--batch-size", type=int, help="batch size")
     parser.add_argument("--lr", type=float, help="learning rate")
+    parser.add_argument("--weight-decay", type=float, help="weight decay")
 
     parser.add_argument("--path", type=str)
 
@@ -107,7 +109,8 @@ if __name__ == "__main__":
 
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
                                num_classes=args.num_classes,
-                               lr=args.lr, batch_size=args.batch_size)
+                               lr=args.lr, weight_decay=args.weight_decay,
+                               batch_size=args.batch_size)
     datamodule = ImageNetDataModule(
         path=args.path, batch_size=args.batch_size, num_workers=args.num_workers,
         class_dict=classes_to_idx)
