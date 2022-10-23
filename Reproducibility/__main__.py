@@ -36,7 +36,7 @@ class WandbCallback(Callback):
             data = [[wandb.Image(x_i), classes_to_idx[int(y_i)], classes_to_idx[int(y_pred)]] for x_i, y_i, y_pred in list(
                 zip([x[i] for i in random_image], [y[i] for i in random_image], [outputs[i] for i in random_image]))]
             wandb_logger.log_table(
-                key=f'{args.surname.capitalize()} on ImageNet Predictions',
+                key=f'{args.surname.capitalize()} on ImageNet Predictions (Batch {batch_idx})',
                 columns=columns,
                 data=data)
 
