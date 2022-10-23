@@ -20,8 +20,8 @@ from classnames import CLASS_NAMES_LIST
 class WandbCallback(Callback):
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
         global wandb_logger
-        # process 15 random images of the first batch
-        if batch_idx == 0:
+        # process 15 random images of of every 1000th batch
+        if batch_idx % 1000 == 0:
             n = 15
             x, y = batch
             outputs = outputs["y_hat"]
