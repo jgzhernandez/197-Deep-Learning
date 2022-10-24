@@ -59,6 +59,7 @@ def get_args():
         "--devices": [0],
         "--accelerator": "gpu",
         "--num-workers": 48,
+        "--optimizer": "Adam",
     }
 
     parser.add_argument("--max-epochs", type=int, help="num epochs")
@@ -73,6 +74,8 @@ def get_args():
     parser.add_argument("--devices", type=int, nargs=1)
     parser.add_argument("--accelerator")
     parser.add_argument("--num-workers", type=int, help="num workers")
+
+    parser.add_argument("--optimizer", type=str)
 
     args = parser.parse_args()
 
@@ -101,7 +104,7 @@ def atienza(num_classes):
 
 def ancheta(num_classes):
     # SqueezeNet 1.1
-    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128
+    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128 --optimizer AdamW
     return models.squeezenet1_1()
 
 
@@ -121,9 +124,18 @@ if __name__ == "__main__":
         "ancheta": SqueezeNet1_1_Weights.IMAGENET1K_V1.transforms(),
     }
 
+    # Sometimes accuracy barely changes so you should choose
+    # a different optimizer from default (Adam)
+    optimizer_selector = {
+        "SGD": torch.optim.SGD,
+        "Adam": torch.optim.Adam,
+        "AdamW": torch.optim.AdamW,
+    }
+
     classes_to_idx = CLASS_NAMES_LIST
 
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
+                               optimizer=optimizer_selector[args.optimizer],
                                num_classes=args.num_classes,
                                lr=args.lr, weight_decay=args.weight_decay,
                                batch_size=args.batch_size)

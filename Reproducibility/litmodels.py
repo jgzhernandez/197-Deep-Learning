@@ -5,11 +5,12 @@ from pytorch_lightning import LightningModule
 
 
 class LitClassifierModel(LightningModule):
-    def __init__(self, model, num_classes=1000, lr=0.001, weight_decay=0, batch_size=32):
+    def __init__(self, model, optimizer, num_classes=1000, lr=0.001, weight_decay=0, batch_size=32):
         super().__init__()
         # To satisfy a warning
         self.save_hyperparameters(ignore=['model'])
         self.model = model
+        self.optimizer = optimizer
         self.loss = torch.nn.CrossEntropyLoss()
 
     def forward(self, x):
@@ -54,6 +55,5 @@ class LitClassifierModel(LightningModule):
     def validation_epoch_end(self, outputs):
         return self.test_epoch_end(outputs)
 
-    # we use Adam optimizer
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay)
+        return self.optimizer(self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay)
