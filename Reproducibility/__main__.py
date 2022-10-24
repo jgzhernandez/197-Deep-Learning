@@ -104,18 +104,106 @@ def atienza(num_classes):
 
 def ancheta(num_classes):
     # SqueezeNet 1.1
-    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128 --optimizer SGD
-    return models.squeezenet1_1()
+    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128 --optimizer SGD --devices 1
+    return models.squeezenet1_1(num_classes=num_classes)
+
+
+def barimbao(num_classes):
+    # RegNetY_3.2GF
+    # GPU 2
+    return None
+
+
+def bascos(num_classes):
+    # RegNetX_1.6GF
+    # GPU 4
+    return None
+
+
+def broqueza(num_classes):
+    # RegNetX_400MF
+    # GPU 5
+    return None
+
+
+def diosana(num_classes):
+    # MobileNet v3 Large
+    # python Reproducibility --surname diosana --max-epochs 100 --weight-decay 0.00001 --batch-size 32 --optimizer RMSprop --devices 3
+    return models.mobilenet_v3_large(num_classes=num_classes)
+
+
+def dumosmog(num_classes):
+    # MNASNet 0.5
+    # GPU 4
+    return None
+
+
+def fajardo(num_classes):
+    # AlexNet
+    # GPU 6
+    return None
+
+
+def floresca(num_classes):
+    # MobileNet v3 Small
+    # GPU 0
+    return None
+
+
+def fuensalida(num_classes):
+    # MobileNet v2
+    # GPU 2
+    return None
+
+
+def hernandez(num_classes):
+    # RegNetY_800MF
+    # GPU 0
+    return None
+
+
+def macaraeg(num_classes):
+    # RegNetY_1.6GF
+    # GPU 7
+    return None
+
+
+def ruaya(num_classes):
+    # MNASNet 0.75
+    # GPU 3
+    return None
+
+
+def santos(num_classes):
+    # MNASNet 1.0
+    # GPU 1
+    return None
 
 
 if __name__ == "__main__":
     args = get_args()
 
-    # Add your model here
+    # Models assigned are randomized if no model preferred in spreadsheet
+    # or if multiple people prefer the same model
+    # https://keamk.com/kj74t2qisytxaz37
+    # GPUs are randomly assigned as well
+    # https://docs.google.com/spreadsheets/d/1YnyNIdhwEifezTKEisNfrNrazTgP-UODpMmvmKfgZxc/edit#gid=0
     model_selector = {
         "resnet18": resnet18,
         "atienza": atienza,
         "ancheta": ancheta,
+        "barimbao": barimbao,
+        "bascos": bascos,
+        "broqueza": broqueza,
+        "diosana": diosana,
+        "dumosmog": dumosmog,
+        "fajardo": fajardo,
+        "floresca": floresca,
+        "fuensalida": fuensalida,
+        "hernandez": hernandez,
+        "macaraeg": macaraeg,
+        "ruaya": ruaya,
+        "santos": santos,
     }
 
     # Add the transforms in your recipe, litdataloader has its own
@@ -126,16 +214,24 @@ if __name__ == "__main__":
 
     # Sometimes accuracy barely changes so you should choose
     # a different optimizer from default (Adam)
+    # Sometimes the recipe also specifies an optimizer
     optimizer_selector = {
         "SGD": torch.optim.SGD,
         "Adam": torch.optim.Adam,
         "AdamW": torch.optim.AdamW,
+        "RMSprop": torch.optim.RMSprop,
+    }
+
+    # Sometimes the recipe specifies a learning rate scheduler
+    scheduler_selector = {
+        "diosana": torch.optim.lr_scheduler.StepLR(optimizer=optimizer_selector[args.optimizer], step_size=2, gamma=0.973),
     }
 
     classes_to_idx = CLASS_NAMES_LIST
 
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
                                optimizer=optimizer_selector[args.optimizer],
+                               scheduler=scheduler_selector.get(args.surname),
                                num_classes=args.num_classes,
                                lr=args.lr, weight_decay=args.weight_decay,
                                batch_size=args.batch_size)
