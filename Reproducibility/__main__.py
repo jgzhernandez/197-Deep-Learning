@@ -104,7 +104,7 @@ def atienza(num_classes):
 
 def ancheta(num_classes):
     # SqueezeNet 1.1
-    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128 --optimizer AdamW
+    # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128 --optimizer SGD
     return models.squeezenet1_1()
 
 
