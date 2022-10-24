@@ -5,7 +5,7 @@ from pytorch_lightning import LightningDataModule
 
 
 class ImageNetDataModule(LightningDataModule):
-    def __init__(self, path, batch_size=128, num_workers=0, class_dict={},
+    def __init__(self, path, batch_size=32, num_workers=0, class_dict={},
                  transform=None,
                  **kwargs):
         super().__init__(**kwargs)
@@ -16,24 +16,39 @@ class ImageNetDataModule(LightningDataModule):
         self.transform = transform
 
     def prepare_data(self):
+        training_transforms, testing_transforms = None, None
         if self.transform is None:
-            self.transform = transforms.Compose([
-                transforms.Pad(300),
-                transforms.CenterCrop(400),
+            image_transforms = transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+            ])
+            tensor_transforms = transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225]),
             ])
+            training_transforms = transforms.Compose([
+                image_transforms,
+                transforms.AutoAugment(),
+                tensor_transforms,
+            ])
+            testing_transforms = transforms.Compose([
+                image_transforms,
+                tensor_transforms,
+            ])
+        else:
+            training_transforms = self.transform
+            testing_transforms = self.transform
 
         self.train_dataset = datasets.ImageNet(
-            "/data/imagenet/", split='train', transform=self.transform)
+            "/data/imagenet/", split='train', transform=training_transforms)
 
         # validation step is the same as test step
         self.val_dataset = datasets.ImageNet(
-            "/data/imagenet/", split='val', transform=self.transform)
+            "/data/imagenet/", split='val', transform=testing_transforms)
 
         self.test_dataset = datasets.ImageNet(
-            "/data/imagenet/", split='val', transform=self.transform)
+            "/data/imagenet/", split='val', transform=testing_transforms)
 
     def setup(self, stage=None):
         self.prepare_data()
@@ -44,7 +59,7 @@ class ImageNetDataModule(LightningDataModule):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             shuffle=True,
-            pin_memory=True,
+            pin_memory=True
         )
 
     def val_dataloader(self):
