@@ -62,4 +62,5 @@ class LitClassifierModel(LightningModule):
         else:
             optimizer = self.optimizer(
                 self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay)
-            return [optimizer, self.scheduler]
+            scheduler = eval(self.scheduler)
+            return [optimizer], [scheduler]

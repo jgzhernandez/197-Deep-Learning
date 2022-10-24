@@ -224,7 +224,7 @@ if __name__ == "__main__":
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
-        "diosana": torch.optim.lr_scheduler.StepLR(optimizer=optimizer_selector[args.optimizer], step_size=2, gamma=0.973),
+        "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
     }
 
     classes_to_idx = CLASS_NAMES_LIST
