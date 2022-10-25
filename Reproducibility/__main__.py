@@ -216,10 +216,15 @@ if __name__ == "__main__":
     # a different optimizer from default (Adam)
     # Sometimes the recipe also specifies an optimizer
     optimizer_selector = {
-        "SGD": torch.optim.SGD,
-        "Adam": torch.optim.Adam,
-        "AdamW": torch.optim.AdamW,
-        "RMSprop": torch.optim.RMSprop,
+        "SGD": "torch.optim.SGD",
+        "Adam": "torch.optim.Adam",
+        "AdamW": "torch.optim.AdamW",
+        "RMSprop": "torch.optim.RMSprop",
+    }
+
+    DEFAULT_OPTIMIZER_PARAMS = "self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay"
+    optimizer_params = {
+        "ancheta": DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9",
     }
 
     # Sometimes the recipe specifies a learning rate scheduler
@@ -230,7 +235,9 @@ if __name__ == "__main__":
     classes_to_idx = CLASS_NAMES_LIST
 
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
-                               optimizer=optimizer_selector[args.optimizer],
+                               optimizer=optimizer_selector[args.optimizer] +
+                               "(" + optimizer_params.get(
+                                   args.surname, DEFAULT_OPTIMIZER_PARAMS) + ")",
                                scheduler=scheduler_selector.get(args.surname),
                                num_classes=args.num_classes,
                                lr=args.lr, weight_decay=args.weight_decay,
@@ -246,6 +253,11 @@ if __name__ == "__main__":
 
     # wandb is a great way to debug and visualize this model
     wandb_logger = WandbLogger(project=f"reproducibility-pl-{args.surname}")
+    wandb_logger.log_hyperparams(args)
+    wandb_logger.log_hyperparams({
+        "optimizer_params": optimizer_params.get(args.surname, DEFAULT_OPTIMIZER_PARAMS),
+        "scheduler": scheduler_selector.get(args.surname),
+    })
 
     model_checkpoint = ModelCheckpoint(
         dirpath=os.path.join(args.path, "checkpoints"),
