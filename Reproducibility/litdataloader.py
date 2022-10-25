@@ -16,7 +16,6 @@ class ImageNetDataModule(LightningDataModule):
         self.transform = transform
 
     def prepare_data(self):
-        training_transforms, testing_transforms = None, None
         if self.transform is None:
             image_transforms = transforms.Compose([
                 transforms.Resize(256),
@@ -27,28 +26,20 @@ class ImageNetDataModule(LightningDataModule):
                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225]),
             ])
-            training_transforms = transforms.Compose([
-                image_transforms,
-                transforms.AutoAugment(),
-                tensor_transforms,
-            ])
-            testing_transforms = transforms.Compose([
+            self.transform = transforms.Compose([
                 image_transforms,
                 tensor_transforms,
             ])
-        else:
-            training_transforms = self.transform
-            testing_transforms = self.transform
 
         self.train_dataset = datasets.ImageNet(
-            "/data/imagenet/", split='train', transform=training_transforms)
+            "/data/imagenet/", split='train', transform=self.transform)
 
         # validation step is the same as test step
         self.val_dataset = datasets.ImageNet(
-            "/data/imagenet/", split='val', transform=testing_transforms)
+            "/data/imagenet/", split='val', transform=self.transform)
 
         self.test_dataset = datasets.ImageNet(
-            "/data/imagenet/", split='val', transform=testing_transforms)
+            "/data/imagenet/", split='val', transform=self.transform)
 
     def setup(self, stage=None):
         self.prepare_data()
