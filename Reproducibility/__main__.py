@@ -229,6 +229,7 @@ if __name__ == "__main__":
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
+        "ancheta": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=10, gamma=0.1)",
         "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
     }
 
