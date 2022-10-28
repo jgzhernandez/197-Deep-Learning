@@ -2,6 +2,7 @@ import torch
 from torchvision import models
 
 from torchvision.models import SqueezeNet1_1_Weights
+from torchvision.models import RegNet_Y_800MF_Weights
 
 import os
 from argparse import ArgumentParser
@@ -159,7 +160,7 @@ def fuensalida(num_classes):
 def hernandez(num_classes):
     # RegNetY_800MF
     # GPU 0
-    return None
+    return models.regnet_y_800mf(num_classes=num_classes)
 
 
 def macaraeg(num_classes):
@@ -210,6 +211,7 @@ if __name__ == "__main__":
     # but it's recommended to use the transforms in your recipe
     transform_selector = {
         "ancheta": SqueezeNet1_1_Weights.IMAGENET1K_V1.transforms(),
+        "hernandez": RegNet_Y_800MF_Weights.IMAGENET1K_V2.transforms(),
     }
 
     # Sometimes accuracy barely changes so you should choose
