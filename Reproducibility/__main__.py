@@ -1,7 +1,8 @@
 import torch
 from torchvision import models
 
-from torchvision.models import SqueezeNet1_1_Weights
+#from torchvision.models import SqueezeNet1_1_Weights
+from torchvision.models import RegNet_Y_400MF_Weights
 
 import os
 from argparse import ArgumentParser
@@ -105,7 +106,9 @@ def atienza(num_classes):
 def ancheta(num_classes):
     # SqueezeNet 1.1
     # python Reproducibility --surname ancheta --max-epochs 100 --lr 0.01 --weight-decay 0.0002 --batch-size 128 --optimizer SGD --devices 1
-    return models.squeezenet1_1(num_classes=num_classes)
+    #return models.squeezenet1_1(num_classes=num_classes)
+    return None
+
 
 
 def barimbao(num_classes):
@@ -129,7 +132,8 @@ def broqueza(num_classes):
 def diosana(num_classes):
     # MobileNet v3 Large
     # python Reproducibility --surname diosana --max-epochs 100 --weight-decay 0.00001 --batch-size 32 --optimizer RMSprop --devices 3
-    return models.mobilenet_v3_large(num_classes=num_classes)
+    #return models.squeezenet1_1(num_classes=num_classes)
+    return None
 
 
 def dumosmog(num_classes):
@@ -177,7 +181,8 @@ def ruaya(num_classes):
 def santos(num_classes):
     # MNASNet 1.0
     # GPU 1
-    return None
+    # python Reproducibility --surname santos --max-epochs 100 --lr 0.005 --weight-decay 0.00005 --batch-size 128 --optimizer SGD --devices 1 
+    return models.regnet_y_400mf(num_classes=num_classes)
 
 
 if __name__ == "__main__":
@@ -209,7 +214,8 @@ if __name__ == "__main__":
     # Add the transforms in your recipe, litdataloader has its own
     # but it's recommended to use the transforms in your recipe
     transform_selector = {
-        "ancheta": SqueezeNet1_1_Weights.IMAGENET1K_V1.transforms(),
+        #"ancheta": SqueezeNet1_1_Weights.IMAGENET1K_V1.transforms(),
+        "santos": RegNet_Y_400MF_Weights.IMAGENET1K_V1.transforms(),
     }
 
     # Sometimes accuracy barely changes so you should choose
@@ -225,12 +231,22 @@ if __name__ == "__main__":
     DEFAULT_OPTIMIZER_PARAMS = "self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay"
     optimizer_params = {
         "ancheta": DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9",
+        
     }
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
-        "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
+        #"diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
+        #torch.optim.lr_scheduler.CosineAnnealingLR( optimizer, T_max=args.epochs - args.lr_warmup_epochs, eta_min=args.lr_min)
+        "santos": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 95, eta_min=0)"
     }
+
+    warmup_selector = {
+        #"diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
+        # torch.optim.lr_scheduler.LinearLR(xoptimizer, start_factor=args.lr_warmup_decay, total_iters=args.lr_warmup_epochs
+        "santos": "torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=5)"
+    }
+
 
     classes_to_idx = CLASS_NAMES_LIST
 
@@ -241,7 +257,7 @@ if __name__ == "__main__":
                                scheduler=scheduler_selector.get(args.surname),
                                num_classes=args.num_classes,
                                lr=args.lr, weight_decay=args.weight_decay,
-                               batch_size=args.batch_size)
+                               batch_size=args.batch_size,warmup=warmup_selector.get(args.surname))
     datamodule = ImageNetDataModule(
         path=args.path, batch_size=args.batch_size, num_workers=args.num_workers,
         class_dict=classes_to_idx,
