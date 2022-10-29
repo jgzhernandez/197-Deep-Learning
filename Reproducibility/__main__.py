@@ -224,12 +224,12 @@ if __name__ == "__main__":
 
     DEFAULT_OPTIMIZER_PARAMS = "self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay"
     optimizer_params = {
-        "ancheta": DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9, nesterov=True",
+        "ancheta": DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9, nesterov=False",
     }
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
-        "ancheta": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=10, gamma=0.1)",
+        "ancheta": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=30, gamma=0.1)",
         "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
     }
 
