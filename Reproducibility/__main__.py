@@ -159,7 +159,7 @@ def fuensalida(num_classes):
 
 def hernandez(num_classes):
     # RegNetY_800MF
-    # python Reproducibility --surname hernandez --max-epochs 100 --lr 0.8 --weight-decay 0.00005 --batch-size 128 --optimizer Adam --devices 0
+    # python Reproducibility --surname hernandez --max-epochs 100 --lr 0.005 --weight-decay 0.00005 --batch-size 128 --optimizer SGD --devices 0
     return models.regnet_y_800mf(num_classes=num_classes)
 
 
@@ -232,6 +232,7 @@ if __name__ == "__main__":
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
         "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
+        "hernandez": "torch.optim.lr_scheduler.CosineAnnealingLR(oprimizer=optimizer, T_max=95, eta_min=0)",
     }
 
     classes_to_idx = CLASS_NAMES_LIST
