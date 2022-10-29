@@ -62,4 +62,4 @@ class LitClassifierModel(LightningModule):
         else:
             optimizer = eval(self.optimizer)
             scheduler = eval(self.scheduler)
-            return [optimizer], [scheduler]
+            return {"optimizer": optimizer, "lr_scheduler": scheduler, "monitor": "test_loss"}
