@@ -5,13 +5,14 @@ from pytorch_lightning import LightningModule
 
 
 class LitClassifierModel(LightningModule):
-    def __init__(self, model, optimizer, scheduler=None, num_classes=1000, lr=0.001, weight_decay=0, batch_size=32):
+    def __init__(self, model, optimizer, scheduler=None, num_classes=1000, lr=0.001, weight_decay=0, batch_size=32, warmup=None):
         super().__init__()
         # To satisfy a warning
         self.save_hyperparameters(ignore=['model'])
         self.model = model
         self.optimizer = optimizer
         self.scheduler = scheduler
+        self.warmup = warmup
         self.loss = torch.nn.CrossEntropyLoss()
 
     def forward(self, x):
@@ -63,3 +64,10 @@ class LitClassifierModel(LightningModule):
             optimizer = eval(self.optimizer)
             scheduler = eval(self.scheduler)
             return [optimizer], [scheduler]
+
+    def configure_warmup(self):
+        if self.warmup is None:
+            return eval(self.warmup)
+        else:
+            warmup = eval(self.warmup)
+            return [warmup]

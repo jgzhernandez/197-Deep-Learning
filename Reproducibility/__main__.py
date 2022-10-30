@@ -235,6 +235,10 @@ if __name__ == "__main__":
         "hernandez": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=95, eta_min=0)",
     }
 
+    warmup_selector = {
+        "hernandez": "torch.optim.lr_scheduler.LinearLR(optimizer=optimizer, start_factor=0.1, total_iters=5)",
+    }
+
     classes_to_idx = CLASS_NAMES_LIST
 
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
@@ -244,7 +248,9 @@ if __name__ == "__main__":
                                scheduler=scheduler_selector.get(args.surname),
                                num_classes=args.num_classes,
                                lr=args.lr, weight_decay=args.weight_decay,
-                               batch_size=args.batch_size)
+                               batch_size=args.batch_size,
+                               warmup=warmup_selector.get(args.surname),
+                               )
     datamodule = ImageNetDataModule(
         path=args.path, batch_size=args.batch_size, num_workers=args.num_workers,
         class_dict=classes_to_idx,
