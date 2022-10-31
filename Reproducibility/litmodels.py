@@ -48,6 +48,7 @@ class LitClassifierModel(LightningModule):
         self.log("test_loss", avg_loss, on_epoch=True, prog_bar=True)
         self.log("test_acc", avg_acc, on_epoch=True, prog_bar=True)
         self.log("test_top5_acc", avg_top5_acc, on_epoch=True, prog_bar=True)
+        self.log("lr", self.hparams.lr, on_epoch=True, prog_bar=True)
 
     # validation is the same as test
     def validation_step(self, batch, batch_idx):
