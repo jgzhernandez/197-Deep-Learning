@@ -159,7 +159,7 @@ def fuensalida(num_classes):
 
 def hernandez(num_classes):
     # RegNetY_800MF
-    # python Reproducibility --surname hernandez --max-epochs 100 --lr 0.005 --weight-decay 0.00005 --batch-size 128 --optimizer SGD --devices 0
+    # python Reproducibility --surname hernandez --max-epochs 100 --lr 0.1 --weight-decay 0.00005 --batch-size 128 --optimizer SGD --devices 0
     return models.regnet_y_800mf(num_classes=num_classes)
 
 
