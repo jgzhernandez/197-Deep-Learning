@@ -229,7 +229,7 @@ if __name__ == "__main__":
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
-        "bascos": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=100, eta_min=0.001)
+        "bascos": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=100, eta_min=0.001)",
         "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
     }
 
