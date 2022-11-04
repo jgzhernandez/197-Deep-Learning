@@ -117,7 +117,7 @@ def barimbao(num_classes):
 def bascos(num_classes):
     # RegNetX_1.6GF
     # GPU 4
-    return None
+    return models.regnet_x_1_6gf(num_classes = num_classes)
 
 
 def broqueza(num_classes):
@@ -229,6 +229,7 @@ if __name__ == "__main__":
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
+        "bascos": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=100, eta_min=0.001)",
         "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
     }
 
