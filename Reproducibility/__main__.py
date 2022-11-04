@@ -159,7 +159,7 @@ def fuensalida(num_classes):
 
 def hernandez(num_classes):
     # RegNetY_800MF
-    # python Reproducibility --surname hernandez --max-epochs 100 --lr 0.1 --weight-decay 0.00005 --batch-size 128 --optimizer SGD --devices 0
+    # python Reproducibility --surname hernandez --max-epochs 100 --lr 0.1 --weight-decay 0.00005 --batch-size 128 --optimizer SGD --devices=0
     return models.regnet_y_800mf(num_classes=num_classes)
 
 
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     # but it's recommended to use the transforms in your recipe
     transform_selector = {
         "ancheta": SqueezeNet1_1_Weights.IMAGENET1K_V1.transforms(),
-        "hernandez": RegNet_Y_800MF_Weights.IMAGENET1K_V2.transforms(),
+        "hernandez": RegNet_Y_800MF_Weights.IMAGENET1K_V1.transforms(),
     }
 
     # Sometimes accuracy barely changes so you should choose
@@ -227,12 +227,13 @@ if __name__ == "__main__":
     DEFAULT_OPTIMIZER_PARAMS = "self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay"
     optimizer_params = {
         "ancheta": DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9",
+        "hernandez" : DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9",
     }
 
     # Sometimes the recipe specifies a learning rate scheduler
     scheduler_selector = {
         "diosana": "torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.973)",
-        "hernandez": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=95, eta_min=0)",
+        "hernandez": "torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=95)",
     }
 
     warmup_selector = {
@@ -242,15 +243,14 @@ if __name__ == "__main__":
     classes_to_idx = CLASS_NAMES_LIST
 
     model = LitClassifierModel(model=model_selector[args.surname](args.num_classes),
-                               optimizer=optimizer_selector[args.optimizer] +
-                               "(" + optimizer_params.get(
-                                   args.surname, DEFAULT_OPTIMIZER_PARAMS) + ")",
+                               optimizer=optimizer_selector[args.optimizer] + "(" + optimizer_params.get(args.surname, DEFAULT_OPTIMIZER_PARAMS) + ")",
                                scheduler=scheduler_selector.get(args.surname),
                                num_classes=args.num_classes,
-                               lr=args.lr, weight_decay=args.weight_decay,
+                               lr=args.lr, 
+                               weight_decay=args.weight_decay,
                                batch_size=args.batch_size,
-                               warmup=warmup_selector.get(args.surname),
-                               )
+                               warmup=warmup_selector.get(args.surname),)
+
     datamodule = ImageNetDataModule(
         path=args.path, batch_size=args.batch_size, num_workers=args.num_workers,
         class_dict=classes_to_idx,
@@ -274,8 +274,7 @@ if __name__ == "__main__":
         save_top_k=1,
         verbose=True,
         monitor='test_acc',
-        mode='max',
-    )
+        mode='max',)
 
     trainer = Trainer(accelerator=args.accelerator,
                       devices=args.devices,
