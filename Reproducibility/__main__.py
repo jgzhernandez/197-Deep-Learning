@@ -227,7 +227,7 @@ if __name__ == "__main__":
     DEFAULT_OPTIMIZER_PARAMS = "self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay"
     optimizer_params = {
         "ancheta": DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9",
-        "hernandez" : DEFAULT_OPTIMIZER_PARAMS + ", momentum=0.9",
+        "hernandez" : "params = self.parameters(), lr=self.hparams.lr, momentum=0.9, weight_decay=self.hparams.weight_decay",
     }
 
     # Sometimes the recipe specifies a learning rate scheduler
